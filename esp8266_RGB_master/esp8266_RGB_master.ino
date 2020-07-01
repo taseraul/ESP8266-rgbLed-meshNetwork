@@ -8,38 +8,28 @@ extern "C"{
   #include "user_interface.h"
 }
 
+#define DEBUG
 
+//Set no. of channels to controll
 #define PWM_CHANNELS 3
-#define PWM_PERIOD 255; // * 200ns ^= 1 kHz
+#define PWM_PERIOD 255; //Set pwm period = 255* 200ns ~= 19 kHz
 
-// Replace with your network credentials
-//const char* ssid     = "Nexus Gamers Pub";
-//const char* password = "nexusrulz1";
-
-// Replace with your network credentials
-//const char* ssid     = "UPC1EDE354";
-//const char* password = "d6dxrXcnas4h";
-
-//const char* ssid     = "weMeshUP";
-//const char* password = "atelierwmu";
-
-const char* ssid     = "#319";
-const char* password = "pdk7-0ao4";
+const char* ssid     = "#319";        //Fill with your wifi ssid
+const char* password = "pdk7-0ao4";   //Fill with your wifi password
 
 const char* ssidAP = "ESP32-Access-Point";
 const char* passwordAP = "123456789";
 
-#define CHAN_AP 1
-
+#define CHAN_AP 1 //Channel for softAP
 
 // Set web server port number to 80
 WiFiServer server(80);
 
-// Decode HTTP GET value
 String redString = "0";
 String greenString = "0";
 String blueString = "0";
 String freqString = "0";
+//index values  variable
 int pos1 = 0;
 int pos2 = 0;
 int pos3 = 0;
@@ -50,8 +40,7 @@ String header;
 
 #define PWM_CHANNELS 3
 
-// PWM setup (choice all pins that you use PWM)
-
+// PWM pins init 
 uint32 io_info[PWM_CHANNELS][3] = {
   // MUX, FUNC, PIN
   {PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0,   0},
@@ -59,10 +48,9 @@ uint32 io_info[PWM_CHANNELS][3] = {
   {PERIPHS_IO_MUX_U0RXD_U, FUNC_GPIO3,   3},
 };
 
-// PWM initial duty: all off
-
 uint32 pwm_duty_init[PWM_CHANNELS];
 
+//MAC adress for slave devices
 uint8_t broadcastAddress1[] = {0xCC, 0x50, 0xE3, 0x1D, 0xF1, 0x6D};//cc-50-e3-1d-f1-6d
 uint8_t broadcastAddress2[] = {0xCC, 0x50, 0xE3, 0x1D, 0xC2, 0xE2};//cc:50:e3:1d:c2:e2
 
@@ -73,6 +61,7 @@ unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 2000;
 
+// Create a color struct
 typedef struct colors {
   uint8_t red;
   uint8_t green;
@@ -81,26 +70,35 @@ typedef struct colors {
 
 colors nowColor;
 
+//preset colors for random jumps
 colors randColors[8] = { {255,255,255}, {255,0,0}, {0,255,248}, {255,93,0}, {0,255,0}, {255,183,0}, {255,0,255}, {0,0,255} };
 unsigned long timer = 0;
+
+//jump delay in ms
 int timerCd = 1000;
+
+//current random color index
 int randIndex = 0;
+
+//flag for random mode
 bool isRand = false;
 
-
+//Callback function for esp-now
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+  #ifdef DEBUG
   if (sendStatus == 0){
-    Serial.println("da");
+    Serial.println("Packet sent");
   }
   else{
-    Serial.println("nu");
+    Serial.println("Packet lost");
   }
+  #endif
 }
 
 void setup() {
-  Serial.begin(115200,SERIAL_8N1,SERIAL_TX_ONLY);
+  Serial.begin(115200,SERIAL_8N1,SERIAL_TX_ONLY);//RX used for one of the outputs
   
-  // configure LED PWM resolution/range and set pins to LOW
+  //set pins to LOW
   pinMode(0,OUTPUT);
   pinMode(2,OUTPUT);
   pinMode(3,OUTPUT);
@@ -112,8 +110,6 @@ void setup() {
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  //WiFi.disconnect();
-  
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -127,24 +123,29 @@ void setup() {
   Serial.println(WiFi.localIP());
   server.begin();
 
+  //Start wifi AP to improve esp-now packet reception
   WiFi.softAP(ssidAP, passwordAP, CHAN_AP, true);  
 
+  //Initialize pwm with 0 duty
   for (uint8_t channel = 0; channel < PWM_CHANNELS; channel++) {
     pwm_duty_init[channel] = 0;
   }
   uint32_t period = PWM_PERIOD;
   pwm_init(period, pwm_duty_init, PWM_CHANNELS, io_info);
-  pwm_start();
+  pwm_start();  //start pwm
 
-  // Init ESP-NOW
+  //Init ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
+
+  //Set as esp-now master
+  //Register callback function
   esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
   esp_now_register_send_cb(OnDataSent);
   
-  // Register peer
+  //Register peer
   esp_now_add_peer(broadcastAddress1, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
   esp_now_add_peer(broadcastAddress2, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 }
@@ -188,9 +189,10 @@ void webPage(){
             // The HTTP response ends with another blank line
             client.println();
 
-            // Request sample: /?r201g32b255
+            // Request sample: /?r201g32b255&
             // Red = 201 | Green = 32 | Blue = 255
             if(header.indexOf("GET /?") >= 0) {
+              //Get data from header
               extractData();
             }
             // Break out of the while loop
@@ -212,6 +214,7 @@ void webPage(){
   }
 }
 void extractData(){
+  //check if random mode
   if(header.indexOf("rand")>=0)
   {
     if(header.indexOf("&t")>=0)
@@ -244,8 +247,8 @@ void updateColors(colors setColor){
 }
 
 void loop(){
-  webPage();
-  if(isRand){
+  webPage();//print webpage to client (if any)
+  if(isRand){ //if random switch colors every timerCd miliseconds
     if(millis()-timer >= timerCd){
       randIndex = (RANDOM_REG32%7 + 1 + randIndex)%8;
       updateColors(randColors[randIndex]);

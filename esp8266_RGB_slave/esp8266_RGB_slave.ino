@@ -23,13 +23,13 @@ uint32 io_info[PWM_CHANNELS][3] = {
 
 uint32 pwm_duty_init[PWM_CHANNELS];
 
+// Create a color struct
 typedef struct colors {
   uint8_t red;
   uint8_t green;
   uint8_t blue;
 } colors;
 
-// Create a struct_message called myData
 colors nowColor;
 
 void setup() {
@@ -43,16 +43,17 @@ void setup() {
   digitalWrite(0,HIGH); //Strip starts as red until connected to Wifi
   digitalWrite(2,LOW);
   digitalWrite(3,LOW);
-  
+
+  //Initialize pwm with 0 duty
   for (uint8_t channel = 0; channel < PWM_CHANNELS; channel++) {
     pwm_duty_init[channel] = 0;
   }
   uint32_t period = PWM_PERIOD;
   pwm_init(period, pwm_duty_init, PWM_CHANNELS, io_info);
-  pwm_start();  //start pwm with 0 duty
+  pwm_start();  //start pwm
 
   
-  //connect to master AP to improve packet reception
+  //Connect to master AP to improve esp-now packet reception
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -60,14 +61,14 @@ void setup() {
     Serial.println("Connecting to Access Point...");
   }
   
-  // Init ESP-NOW
+  //Init ESP-NOW
   if (esp_now_init() != 0) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
   
   // Set as esp now slave
-  // set recieve callback function
+  // Set recieve callback function
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
 }
