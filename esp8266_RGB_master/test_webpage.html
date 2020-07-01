@@ -1,0 +1,254 @@
+<!DOCTYPE html><html>
+<head><meta name="viewport" content="width=device-width, initial-scale=0.5">
+<style>
+body {
+	background: white;
+}
+
+input[type="range"]	 {
+	 -webkit-appearance: none;
+    width: 100%;
+    height: 150px;
+    margin: auto;
+	background: transparent;
+}
+input::-webkit-slider-runnable-track {
+    width: 450px;
+    height: 30px;
+    background: linear-gradient(to right, red,yellow,green,turquoise,blue,violet,red);
+    border: solid 2px;
+	border-color : #000000;
+    border-radius: 15px;
+
+}
+
+
+#slider4::-webkit-slider-runnable-track {
+background: linear-gradient(to right, white,black);
+}
+#animRange::-webkit-slider-runnable-track {
+background: #787878;
+}
+
+input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: rgba(0,0,0,1);
+    margin-top: -4px;
+}
+input:focus {
+    outline: none;
+}
+.center{
+	margin:auto;
+	width:70%;
+}
+
+group + group {
+  margin-top: 20px;
+}
+
+.inline-radio {
+	display: flex;
+	border-radius: 3px;
+	overflow: hidden;
+	border: 1px solid #b6b6b6;
+}
+
+.inline-radio div {
+	position: relative;
+	flex: 1;
+}
+
+.inline-radio input {
+	width: 100%;
+	height: 60px;
+	opacity: 0;
+}
+
+.inline-radio label {
+	position: absolute;
+	top: 0; left: 0;
+	color: #b6b6b6;
+	width: 100%;
+	height: 100%;
+	background: #505050;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	border-right: 1px solid #b6b6b6;
+}
+
+.inline-radio div:last-child label {
+	border-right: 0;
+}
+
+.inline-radio input:checked + label {
+	background: #707070;
+	font-weight: 500;
+	color: #000;
+}
+
+group + group {
+  margin-top: 20px;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+
+</style>
+<head>
+<body>
+<form action="" method="get">
+<div id="container1" style="border-radius:30px;margin-bottom:20px;margin-top:20px;">
+	<div class="center">
+		<input id="slider1" name="rgb1" type="range" step="1" max="360" min="0" value="0"/>
+	</div>
+</div>
+<div id="container2" style="display:none;border-radius:30px;margin-bottom:20px;margin-top:20px;">
+	<div class="center">
+		<input id="slider2" name="rgb2" type="range" step="1" max="360" min="0" value="0"/>
+	</div>
+</div>
+<div id="container3" style="display:none;border-radius:30px;margin-bottom:20px;margin-top:20px;">
+	<div class="center">
+		<input id="slider3" name="rgb3" type="range" step="1" max="360" min="0" value="0"/>
+	</div>
+</div>
+<div id="container4" style="border-radius:30px;margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
+	<div class="center">
+		<input id="slider4" name="intens" type="range" step="1" max="9" min="0" value="0"/>
+	</div>
+</div>
+<div id="container5" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
+		<group class="inline-radio">
+		  <div><input type="radio" id="c2" name="cno" value="2c">
+		  <label for="2c">2 color</label></div>
+		  <div><input type="radio" id="c3" name="cno" value="3c">
+		  <label for="3c">3 color</label></div>
+		</group>
+</div>
+<div id="container6" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color:#000000;overflow:none;">
+
+	<group class="inline-radio">
+		  <div><input type="radio" id="static" name="anim" value="1" checked>
+		  <label for="st">Static color</label></div>
+		  <div><input type="radio" id="cr" name="anim" value="2">
+		  <label for="1cr">Color range</label></div>
+		  <div><input type="radio" id="cfl" name="anim" value="3">
+		  <label for="2cf">Color fade loop</label></div>
+		  <div><input type="radio" id="cfr" name="anim" value="4">
+		  <label for="3cf">Color fade rewind</label></div>
+	  </group>
+
+</div>
+<div id="container7" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
+		<group class="inline-radio">
+		  <div><input type="radio" id="mirror" name="same" value="1" checked>
+		  <label for="mir">Mirrored colors</label></div>
+		  <div><input type="radio" id="independent" name="same" value="0">
+		  <label for="ind">Independent colors</label></div>
+		</group>
+</div>
+<div id="container8" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
+		<group class="inline-radio">
+		  <div><input type="checkbox" id="ls0" name="strips" value="0">
+		  <label for="ls0">Zone 0</label></div>
+		  <div><input type="checkbox" id="ls1" name="strips" value="1">
+		  <label for="ls1">Zone 1</label></div>
+		  <div><input type="checkbox" id="ls2" name="strips" value="2">
+		  <label for="ls2">Zone 2</label></div>
+		  <div><input type="checkbox" id="ls3" name="strips" value="3">
+		  <label for="ls3">Zone 3</label></div>
+		</group>
+</div>
+<div id="container9" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
+		<group class="inline-radio">
+		  <div><input type="submit" id="upd">
+		  <label for="upd">Update</label></div>
+
+		</group>
+</div>
+</form>
+</body>
+<script>
+
+var slider1 = document.getElementById("slider1");
+var slider2 = document.getElementById("slider2");
+var slider3 = document.getElementById("slider3");
+var slider4 = document.getElementById("slider4");
+setInterval(function(){
+	var val1 = slider1.value;
+	document.getElementById("container1").style.background = "hsl("+val1+", 100%, 50%)";
+
+	var val2 = slider2.value;
+	document.getElementById("container2").style.background = "hsl("+val2+", 100%, 50%)";
+
+	var val3 = slider3.value;
+	document.getElementById("container3").style.background = "hsl("+val3+", 100%, 50%)";
+
+	var val4 = slider4.value;
+	document.getElementById("container4").style.background = "hsl(0, 0%, "+(100-val4*10)+"%)";
+	var c2 = document.getElementById("c2").checked;
+	var c3 = document.getElementById("c3").checked;
+	var anim1 = document.getElementById("static").checked;
+	if(anim1){
+		document.getElementById("container5").style.display = "none";
+		document.getElementById("container2").style.display = "none";
+		document.getElementById("container3").style.display = "none";
+		document.getElementById("c2").checked = false;
+		document.getElementById("c3").checked = false;
+	}
+	var anim2 = document.getElementById("cr").checked;
+	if(anim2){
+		document.getElementById("container5").style.display = "none";
+		document.getElementById("container2").style.display = "none";
+		document.getElementById("container3").style.display = "none";
+		document.getElementById("c2").checked = false;
+		document.getElementById("c3").checked = false;
+	}
+	var anim3 = document.getElementById("cfl").checked;
+	if(anim3){
+		if(!(c2 || c3)){
+			document.getElementById("c2").checked = true;
+		}
+		document.getElementById("container5").style.display = "block";
+	}
+	var anim4 = document.getElementById("cfr").checked;
+	if(anim4){
+		if(!(c2 || c3)){
+			document.getElementById("c2").checked = true;
+		}
+		document.getElementById("container5").style.display = "block";
+	}
+
+	if(c2){
+		document.getElementById("container2").style.display = "block";
+		document.getElementById("container3").style.display = "none";
+	}else {
+		if(c3){
+			document.getElementById("container3").style.display = "block";
+			document.getElementById("container2").style.display = "block";
+		}
+		else{
+		document.getElementById("container2").style.display = "none";
+		document.getElementById("container3").style.display = "none";
+		}
+	}
+	var mir = document.getElementById("mirror").checked;
+	var ind = document.getElementById("independent").checked;
+	if(mir){
+		document.getElementById("container8").style.display = "none";
+	}
+	if(ind){
+		document.getElementById("container8").style.display = "block";
+	}
+})
+</script>
+
+</html>
