@@ -24,7 +24,7 @@ input::-webkit-slider-runnable-track {
 
 
 #slider4::-webkit-slider-runnable-track {
-background: linear-gradient(to right, white,black);
+background: linear-gradient(to right,black,white);
 }
 #slider3::-webkit-slider-runnable-track {
 background: white;
@@ -110,23 +110,23 @@ group + group {
 <form action="" method="get">
 <div id="container1" style="border-radius:30px;margin-bottom:20px;margin-top:20px;">
 	<div class="center">
-		<input id="slider1" name="rgb1" type="range" step="0.01" max="360" min="0" value="0"/>
+		<input id="slider1" name="rgb1" type="range" step="0.1" max="360" min="0" value="0"/>
 	</div>
 </div>
 <div id="container2" style="display:none;border-radius:30px;margin-bottom:20px;margin-top:20px;">
 	<div class="center">
-		<input id="slider2" name="rgb2" type="range" step="0.01" max="360" min="0" value="0"/>
+		<input id="slider2" name="rgb2" type="range" step="0.1" max="360" min="0" value="0"/>
 	</div>
 </div>
 <div id="container3" style="border-radius:30px;margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
 	<div class="center">
-		<input id="slider3" name="timer" type="range" step="10" max="3000" min="200" value="1000"/>
+		<input id="slider3" name="timer" type="range" step="10" max="10000" min="200" value="1000"/>
 		<h1 id="timerText" style="text-align:center;">10</h1>
 	</div>
 </div>
 <div id="container4" style="border-radius:30px;margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
 	<div class="center">
-		<input id="slider4" name="intens" type="range" step="1" max="9" min="0" value="0"/>
+		<input id="slider4" name="intens" type="range" step="1" max="10" min="0" value="10"/>
 	</div>
 </div>
 <div id="container6" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color:#000000;overflow:none;">
@@ -185,7 +185,7 @@ setInterval(function(){
 	document.getElementById("container2").style.background = "hsl("+val2+", 100%, 50%)";
 
 	var val4 = slider4.value;
-	document.getElementById("container4").style.background = "hsl(0, 0%, "+(100-val4*10)+"%)";
+	document.getElementById("container4").style.background = "hsl(0, 0%, "+(100*val4/10)+"%)";
 	var anim1 = document.getElementById("cfl").checked;
 	if(!anim1){
 		document.getElementById("container2").style.display = "none";
