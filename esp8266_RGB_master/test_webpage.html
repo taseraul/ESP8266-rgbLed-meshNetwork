@@ -26,6 +26,9 @@ input::-webkit-slider-runnable-track {
 #slider4::-webkit-slider-runnable-track {
 background: linear-gradient(to right, white,black);
 }
+#slider3::-webkit-slider-runnable-track {
+background: white;
+}
 #animRange::-webkit-slider-runnable-track {
 background: #787878;
 }
@@ -107,17 +110,18 @@ group + group {
 <form action="" method="get">
 <div id="container1" style="border-radius:30px;margin-bottom:20px;margin-top:20px;">
 	<div class="center">
-		<input id="slider1" name="rgb1" type="range" step="1" max="360" min="0" value="0"/>
+		<input id="slider1" name="rgb1" type="range" step="0.01" max="360" min="0" value="0"/>
 	</div>
 </div>
 <div id="container2" style="display:none;border-radius:30px;margin-bottom:20px;margin-top:20px;">
 	<div class="center">
-		<input id="slider2" name="rgb2" type="range" step="1" max="360" min="0" value="0"/>
+		<input id="slider2" name="rgb2" type="range" step="0.01" max="360" min="0" value="0"/>
 	</div>
 </div>
-<div id="container3" style="display:none;border-radius:30px;margin-bottom:20px;margin-top:20px;">
+<div id="container3" style="border-radius:30px;margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
 	<div class="center">
-		<input id="slider3" name="rgb3" type="range" step="1" max="360" min="0" value="0"/>
+		<input id="slider3" name="timer" type="range" step="10" max="3000" min="200" value="1000"/>
+		<h1 id="timerText" style="text-align:center;">10</h1>
 	</div>
 </div>
 <div id="container4" style="border-radius:30px;margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
@@ -125,25 +129,17 @@ group + group {
 		<input id="slider4" name="intens" type="range" step="1" max="9" min="0" value="0"/>
 	</div>
 </div>
-<div id="container5" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color : #000000;">
-		<group class="inline-radio">
-		  <div><input type="radio" id="c2" name="cno" value="2c">
-		  <label for="2c">2 color</label></div>
-		  <div><input type="radio" id="c3" name="cno" value="3c">
-		  <label for="3c">3 color</label></div>
-		</group>
-</div>
 <div id="container6" style="margin-bottom:20px;margin-top:20px;border:solid 2px;border-color:#000000;overflow:none;">
 
 	<group class="inline-radio">
-		  <div><input type="radio" id="static" name="anim" value="1" checked>
+		  <div><input type="radio" id="static" name="anim" value="0" checked>
 		  <label for="st">Static color</label></div>
-		  <div><input type="radio" id="cr" name="anim" value="2">
-		  <label for="1cr">Color range</label></div>
-		  <div><input type="radio" id="cfl" name="anim" value="3">
-		  <label for="2cf">Color fade loop</label></div>
-		  <div><input type="radio" id="cfr" name="anim" value="4">
-		  <label for="3cf">Color fade rewind</label></div>
+		  <div><input type="radio" id="cfl" name="anim" value="1">
+		  <label for="cfl">Color fade loop</label></div>
+		  <div><input type="radio" id="rand" name="anim" value="2">
+		  <label for="rand">Random colors</label></div>
+		  <div><input type="radio" id="mic" name="anim" value="3">
+		  <label for="mic">Microphone input</label></div>
 	  </group>
 
 </div>
@@ -180,7 +176,6 @@ group + group {
 
 var slider1 = document.getElementById("slider1");
 var slider2 = document.getElementById("slider2");
-var slider3 = document.getElementById("slider3");
 var slider4 = document.getElementById("slider4");
 setInterval(function(){
 	var val1 = slider1.value;
@@ -189,56 +184,22 @@ setInterval(function(){
 	var val2 = slider2.value;
 	document.getElementById("container2").style.background = "hsl("+val2+", 100%, 50%)";
 
-	var val3 = slider3.value;
-	document.getElementById("container3").style.background = "hsl("+val3+", 100%, 50%)";
-
 	var val4 = slider4.value;
 	document.getElementById("container4").style.background = "hsl(0, 0%, "+(100-val4*10)+"%)";
-	var c2 = document.getElementById("c2").checked;
-	var c3 = document.getElementById("c3").checked;
-	var anim1 = document.getElementById("static").checked;
-	if(anim1){
-		document.getElementById("container5").style.display = "none";
+	var anim1 = document.getElementById("cfl").checked;
+	if(!anim1){
 		document.getElementById("container2").style.display = "none";
-		document.getElementById("container3").style.display = "none";
-		document.getElementById("c2").checked = false;
-		document.getElementById("c3").checked = false;
 	}
-	var anim2 = document.getElementById("cr").checked;
-	if(anim2){
-		document.getElementById("container5").style.display = "none";
-		document.getElementById("container2").style.display = "none";
-		document.getElementById("container3").style.display = "none";
-		document.getElementById("c2").checked = false;
-		document.getElementById("c3").checked = false;
-	}
-	var anim3 = document.getElementById("cfl").checked;
-	if(anim3){
-		if(!(c2 || c3)){
-			document.getElementById("c2").checked = true;
-		}
-		document.getElementById("container5").style.display = "block";
-	}
-	var anim4 = document.getElementById("cfr").checked;
-	if(anim4){
-		if(!(c2 || c3)){
-			document.getElementById("c2").checked = true;
-		}
-		document.getElementById("container5").style.display = "block";
-	}
-
-	if(c2){
+	else{
 		document.getElementById("container2").style.display = "block";
+	}
+	var timer = document.getElementById("cfl").checked || document.getElementById("rand").checked;
+	if(!timer){
 		document.getElementById("container3").style.display = "none";
-	}else {
-		if(c3){
-			document.getElementById("container3").style.display = "block";
-			document.getElementById("container2").style.display = "block";
-		}
-		else{
-		document.getElementById("container2").style.display = "none";
-		document.getElementById("container3").style.display = "none";
-		}
+	}
+	else{
+		document.getElementById("container3").style.display = "block";
+		document.getElementById("timerText").textContent = document.getElementById("slider3").value;
 	}
 	var mir = document.getElementById("mirror").checked;
 	var ind = document.getElementById("independent").checked;
