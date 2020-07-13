@@ -430,22 +430,28 @@ void webPage()
 
 uint8_t getRed(float val)
 {
-  if(val <= 0) val = 0;
-  if(val >= 360) val = 360;
+  if (val <= 0)
+    val = 0;
+  if (val >= 360)
+    val = 360;
   uint8_t red = ((val >= 0 && val <= 60) || (val >= 300 && val <= 360)) ? 255 : ((val >= 120 && val <= 240) ? 0 : (val >= 60 && val <= 120) ? (255 - 255.0 / 60 * (val - 60)) : ((val >= 240 && val <= 300) ? (0 + 255.0 / 60 * (val - 240)) : 0));
   return red;
 }
 uint8_t getGreen(float val)
 {
-  if(val <= 0) val = 0;
-  if(val >= 360) val = 360;
+  if (val <= 0)
+    val = 0;
+  if (val >= 360)
+    val = 360;
   uint8_t green = (val >= 60 && val <= 180) ? 255 : ((val >= 240 && val <= 360) ? 0 : ((val >= 0 && val <= 60) ? (0 + 255.0 / 60 * val) : ((val >= 180 && val <= 240) ? (255 - 255.0 / 60 * (val - 180)) : 0)));
   return green;
 }
 uint8_t getBlue(float val)
 {
-  if(val <= 0) val = 0;
-  if(val >= 360) val = 360;
+  if (val <= 0)
+    val = 0;
+  if (val >= 360)
+    val = 360;
   uint8_t blue = (val >= 0 && val <= 120) ? 0 : ((val >= 180 && val <= 300) ? 255 : ((val >= 120 && val <= 180) ? (0 + 255.0 / 60 * (val - 120)) : ((val >= 300 && val <= 360) ? (255 - 255.0 / 60 * (val - 300)) : 0)));
   return blue;
 }
@@ -454,12 +460,12 @@ int getGETvalueInt(int index)
 {
   String tmp = "";
   if (header.indexOf('&', index) >= 0)
-    tmp = header.substring(header.indexOf('=', index)+1, header.indexOf('&', index));
+    tmp = header.substring(header.indexOf('=', index) + 1, header.indexOf('&', index));
   else
-    tmp = header.substring(header.indexOf('=', index)+1);
-    #ifdef DEBUG
-    Serial.println(tmp);
-    #endif
+    tmp = header.substring(header.indexOf('=', index) + 1);
+#ifdef DEBUG
+  Serial.println(tmp);
+#endif
   return tmp.toInt();
 }
 
@@ -467,12 +473,12 @@ float getGETvalueFloat(int index)
 {
   String tmp = "";
   if (header.indexOf('&', index) >= 0)
-    tmp = header.substring(header.indexOf('=', index)+1, header.indexOf('&', index));
+    tmp = header.substring(header.indexOf('=', index) + 1, header.indexOf('&', index));
   else
-    tmp = header.substring(header.indexOf('=', index)+1);
-  #ifdef DEBUG
-    Serial.println(tmp);
-  #endif
+    tmp = header.substring(header.indexOf('=', index) + 1);
+#ifdef DEBUG
+  Serial.println(tmp);
+#endif
   return tmp.toFloat();
 }
 
@@ -490,9 +496,9 @@ void extractData()
   {
     val = getGETvalueInt(index);
     tmpRgbStrip.intensity = val / 10.0f;
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(tmpRgbStrip.intensity);
-    #endif
+#endif
   }
 
   index = header.indexOf("anim");
@@ -500,9 +506,9 @@ void extractData()
   {
     val = getGETvalueInt(index);
     tmpRgbStrip.animateType = val;
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(tmpRgbStrip.animateType);
-    #endif
+#endif
   }
 
   index = header.indexOf("rgb1");
@@ -510,28 +516,28 @@ void extractData()
   {
     tmpRgbStrip.HSLnow = getGETvalueFloat(index);
     tmpRgbStrip.HSL1 = tmpRgbStrip.HSLnow;
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(tmpRgbStrip.HSLnow);
     Serial.println(tmpRgbStrip.HSL1);
-    #endif
+#endif
   }
 
   index = header.indexOf("rgb2");
   if (index >= 0)
   {
     tmpRgbStrip.HSL2 = getGETvalueFloat(index);
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(tmpRgbStrip.HSL2);
-    #endif
+#endif
   }
 
   index = header.indexOf("same");
   if (index >= 0)
   {
     mirror = getGETvalueInt(index) == 0 ? false : true;
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(mirror);
-    #endif
+#endif
   }
 
   index = header.indexOf("timer");
@@ -545,23 +551,25 @@ void extractData()
     }
     if (rgbStrip.animateType == 2)
     {
+      timerCd = val;
     }
     if (rgbStrip.animateType == 3)
     {
       timerCd = val / (360 / rgbStrip.step);
     }
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println(timerCd);
-    #endif
+#endif
   }
   //---------------------------------------------------
   if (mirror)
   {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println("SENDING TO ALL");
-    #endif
+#endif
     esp_now_send(NULL, (uint8_t *)&tmpRgbStrip, sizeof(tmpRgbStrip));
     rgbStrip = tmpRgbStrip;
+    updateLED();
   }
   else
   {
@@ -572,6 +580,7 @@ void extractData()
       if (val == 0)
       {
         rgbStrip = tmpRgbStrip;
+        updateLED();
       }
       else
         esp_now_send(broadcastAddress[val - 1], (uint8_t *)&tmpRgbStrip, sizeof(tmpRgbStrip));
@@ -580,61 +589,59 @@ void extractData()
   }
 }
 
-void updateLED(bool initial)
+void updateLED()
 {
-  if (initial)
-  {
-    switch (rgbStrip.animateType)
+  switch (rgbStrip.animateType) {
+  case 1:
+    rgbStrip.HSLnow += dir * rgbStrip.step;
+    if (rgbStrip.HSLnow <= 0)
     {
-    case 1:
-      rgbStrip.HSLnow += dir * rgbStrip.step; 
-      if (rgbStrip.HSLnow == 0){
-        rgbStrip.HSLnow = 360;
-      }
-      else if (rgbStrip.HSLnow == 360){
-        rgbStrip.HSLnow = 0;
-      }
-      if(rgbStrip.HSL1 < rgbStrip.HSL2)
-        if (rgbStrip.HSLnow <= rgbStrip.HSL1 || rgbStrip.HSLnow >= rgbStrip.HSL2)
-            dir *= -1;
-      if(rgbStrip.HSL1 >= rgbStrip.HSL2)
-        if (rgbStrip.HSLnow <= rgbStrip.HSL1 && rgbStrip.HSLnow >= rgbStrip.HSL2)
-            dir *= -1;
-      if(rgbStrip.HSL1 == rgbStrip.HSL2)
-        dir = 1;
-      #ifdef DEBUG
-        Serial.println(rgbStrip.HSLnow);
-        Serial.println(getRed(rgbStrip.HSLnow));
-      #endif
-      break;
-
-    case 2:
-      rgbStrip.HSLnow = RANDOM_REG32 % 12 * 30;
-      break;
-
-    case 3:
-    #ifndef DEBUG
-      rgbStrip.HSLnow += rgbStrip.step;
-      if (rgbStrip.HSLnow == 360)
-        rgbStrip.HSLnow = 0;
-      if (digitalRead(1) == 1)
-        rgbStrip.intensity *= 1.1;
-      else
-        rgbStrip.intensity /= 1.1;
-      if (rgbStrip.intensity >= 1)
-        rgbStrip.intensity = 1;
-      if (rgbStrip.intensity <= 0.2)
-        rgbStrip.intensity = 0.2;
-    #endif
-      break;
-
-    default:
-      break;
+      rgbStrip.HSLnow = 360;
     }
-    updateTimer = millis();
+    else if (rgbStrip.HSLnow >= 360)
+    {
+      rgbStrip.HSLnow = 0;
+    }
+    if (rgbStrip.HSL1 < rgbStrip.HSL2)
+      if (rgbStrip.HSLnow <= rgbStrip.HSL1 || rgbStrip.HSLnow >= rgbStrip.HSL2)
+        dir *= -1;
+    if (rgbStrip.HSL1 >= rgbStrip.HSL2)
+      if (rgbStrip.HSLnow <= rgbStrip.HSL1 && rgbStrip.HSLnow >= rgbStrip.HSL2)
+        dir *= -1;
+    if (rgbStrip.HSL1 == 0 && rgbStrip.HSL2 == 360)
+      dir = 1;
+#ifdef DEBUG
+    Serial.println(rgbStrip.HSLnow);
+    Serial.println(getRed(rgbStrip.HSLnow));
+#endif
+    break;
+
+  case 2:
+    rgbStrip.HSLnow = RANDOM_REG32 % 12 * 30;
+    break;
+
+  case 3:
+#ifndef DEBUG
+    rgbStrip.HSLnow += rgbStrip.step;
+    if (rgbStrip.HSLnow == 360)
+      rgbStrip.HSLnow = 0;
+    if (digitalRead(1) == 1)
+      rgbStrip.intensity *= 1.1;
+    else
+      rgbStrip.intensity /= 1.1;
+    if (rgbStrip.intensity >= 1)
+      rgbStrip.intensity = 1;
+    if (rgbStrip.intensity <= 0.2)
+      rgbStrip.intensity = 0.2;
+#endif
+    break;
+
+  default:
+    break;
   }
-  if (mirror)
-    //esp_now_send(NULL, (uint8_t *)&rgbStrip, sizeof(rgbStrip));
+  updateTimer = millis();
+  //if (mirror)
+  //  esp_now_send(NULL, (uint8_t *)&rgbStrip, sizeof(rgbStrip)); //must check if it can send pakets as fast as the led refresh time
   pwm_set_duty(getRed(rgbStrip.HSLnow) * rgbStrip.intensity, 0);
   pwm_set_duty(getGreen(rgbStrip.HSLnow) * rgbStrip.intensity, 1);
   pwm_set_duty(getBlue(rgbStrip.HSLnow) * rgbStrip.intensity, 2);
@@ -646,6 +653,6 @@ void loop()
   webPage();
   if (rgbStrip.animateType > 0 && (millis() - updateTimer >= timerCd))
   {
-    updateLED(true);
+    updateLED();
   }
 }

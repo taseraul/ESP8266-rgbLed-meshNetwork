@@ -1,3 +1,4 @@
 /esp8266_RGBnexus
 *.b#*
 *.s#*
+/.vscode
