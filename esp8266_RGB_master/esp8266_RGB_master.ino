@@ -323,20 +323,26 @@ void setup()
   digitalWrite(3, LOW);
 
   // Connect to Wi-Fi network with SSID and password
+  #ifdef DEBUG
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+  #endif
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
+    #ifdef DEBUG
     Serial.print(".");
+    #endif
   }
   // Print local IP address and start web server
+  #ifdef DEBUG
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  #endif
   server.begin();
 
   //Start wifi AP to improve esp-now packet reception
